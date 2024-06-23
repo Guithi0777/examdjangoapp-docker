@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  django-app:
+    image: dockergt15100/djangotest_app:v1
+    container_name: django-app
+    restart: always
+    ports:
+      - "9090:8000"
+    networks:
+      docker_net_gt2:
+        ipv4_address: 178.24.0.3
+
+  sqlite3:
+    image: dockergt15100/ssh.prod:v1
+    container_name: sqlite3-part
+    ports:
+      - "3900:3900" 
+    volumes:
+      - sqlite_data:/data
+    restart: always
+    networks:
+      docker_net_gt2:
+        ipv4_address: 178.24.0.4
+    depends_on:
+      - django-app  
+
+  dnsmasq:
+    image: dockergt15100/dnsprod:v1
+    container_name: dns-part
+    volumes:
+      - ./dnsmasq/dnsmasq.conf
+       - /etc/dnsmasq/0.base.conf:/etc/dnsmasq.conf
+    ports:
+      - "53:53/udp"
+      - "67:67/udp"
+    restart: always
+    networks:
+      docker_net_gt2:
+        ipv4_address: 178.24.0.5
+    cap_add:
+      - NET_ADMIN
+    depends_on:
+      - django-app       
+  
+  
+  sshconnection_grafana:
+    image: dockergt15100/sshgrafana.prod:v20
+    container_name: ssh-grafana-part
+    ports:
+      - "2222:22"
+      - "3000:3000"
+    networks:
+      docker_net_gt2:
+        ipv4_address: 178.24.0.11
+
+  prometheus:
+   image: prom/prometheus:v2.37.9
+   container_name: prometheus
+   ports:
+    - 9091:8007
+   command:
+    - '--config.file=/etc/prometheus/prometheus.yaml'
+   volumes:
+    - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+    - ./data:/prometheus
+   restart: unless-stopped
+   networks:
+      docker_net_gt2:
+        ipv4_address: 178.24.0.17      
+
+
+networks:
+  docker_net_gt2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 178.24.0.0/16
+          ip_range: 178.24.1.0/24
+          gateway: 178.24.0.2
+
+volumes:
+  sqlite_data: {}
+  prometheus_data: {}
+  grafana_data: {}
+
+

@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'django-app'
+    static_configs:
+      - targets: ['178.24.0.3:8000']
+
+  - job_name: 'sqlite3'
+    static_configs:
+      - targets: ['178.24.0.4:3900']
+
+  - job_name: 'dnsmasq'
+    static_configs:
+      - targets: ['178.24.0.5:53']
+
+  - job_name: 'sshconnection_grafana'
+    static_configs:
+      - targets: ['178.24.0.11:22', '178.24.0.11:3000']
+
+  

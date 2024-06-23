@@ -1,0 +1,46 @@
+apiVersion: 1
+
+datasources:
+- name: 'sqlite3'
+  type: sqlite3
+  access: 'proxy'
+  url: '/data/sqlite_database.db'
+  readOnly: false
+  jsonData:
+    someOtherData: 'value'  
+
+- name: 'django-app'
+  type: 'prometheus'
+  access: 'proxy'
+  url: 'http://prometheus:8000' 
+  isDefault: false
+  jsonData:
+    tlsAuth: false
+    tlsAuthWithCACert: false
+
+- name: 'sqlite3'
+  type: 'prometheus'
+  access: 'proxy'
+  url: 'http://prometheus:3900'
+  isDefault: false
+  jsonData:
+    tlsAuth: false
+    tlsAuthWithCACert: false
+
+- name: 'dnsmasq'
+  type: 'prometheus'
+  access: 'proxy'
+  url: 'http://prometheus:9090' 
+  isDefault: false
+  jsonData:
+    tlsAuth: false
+    tlsAuthWithCACert: false
+
+- name: 'pushgateway'
+  type: 'prometheus'
+  access: 'proxy'
+  url: 'http://prometheus:9091' 
+  isDefault: false
+  jsonData:
+    tlsAuth: false
+    tlsAuthWithCACert: false
